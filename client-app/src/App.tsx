@@ -1,30 +1,79 @@
 import React, { useEffect, useState } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import axios from "axios";
-import { Header, List } from "semantic-ui-react";
+import { Container, Header, List } from "semantic-ui-react";
+import { Activity } from "./models/Activity";
+import Navbar from "./components/Navbar";
+import { ActivityDashboard } from "./pages/activities/dashboard/ActivityDashboard";
+import { v4 } from "uuid";
 
 function App() {
-  const [activities, setActivities] = useState<any[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [selectedActivity, setSelectedActivity] = useState<
+    Activity | undefined
+  >(undefined);
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     getActivities();
   }, []);
 
   const getActivities = async () => {
-    const { data } = await axios.get("https://localhost:5001/api/activities");
+    const { data } = await axios.get<Activity[]>(
+      "https://localhost:5001/api/activities"
+    );
     setActivities(data);
   };
 
+  const handleSelectActivity = (id: string) => {
+    setSelectedActivity(activities.find((a) => a.id === id));
+  };
+
+  const handleCancelSelectedActivity = () => {
+    setSelectedActivity(undefined);
+  };
+
+  const handleFormOpen = (id?: string) => {
+    id ? handleSelectActivity(id) : handleCancelSelectedActivity();
+    setEditMode(true);
+  };
+
+  const handleFormClose = () => {
+    setEditMode(false);
+  };
+
+  function handleCreateOrEditActivity(activity: Activity) {
+    activity.id
+      ? setActivities([
+          ...activities.filter((x) => x.id !== activity.id),
+          activity,
+        ])
+      : setActivities([...activities, { ...activity, id: v4() }]);
+    setEditMode(false);
+    setSelectedActivity(activity);
+  }
+
+  function handleDeleteActivity(id: string) {
+    setActivities([...activities.filter((x) => x.id !== id)]);
+  }
+
   return (
-    <>
-      <Header as="h2" icon="users" content="Reactivities" />
-      <List>
-        {activities.map((activity, index) => (
-          <List.Item key={index}>{activity.title}</List.Item>
-        ))}
-      </List>
-    </>
+    <React.Fragment>
+      <Navbar openForm={handleFormOpen} />
+      <Container style={{ marginTop: "7rem" }}>
+        <ActivityDashboard
+          activities={activities}
+          selectedActivity={selectedActivity}
+          selectActivity={handleSelectActivity}
+          cancelSelectedActivity={handleCancelSelectedActivity}
+          editMode={editMode}
+          openForm={handleFormOpen}
+          closeForm={handleFormClose}
+          createOrEdit={handleCreateOrEditActivity}
+          deleteActivity={handleDeleteActivity}
+        />
+      </Container>
+    </React.Fragment>
   );
 }
 
