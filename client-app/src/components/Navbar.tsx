@@ -1,4 +1,5 @@
 import React, { ReactElement } from "react";
+import { NavLink } from "react-router-dom";
 import { Button, Container, Menu } from "semantic-ui-react";
 import { useStore } from "../stores/store";
 
@@ -18,10 +19,11 @@ export default function Navbar({}: Props): ReactElement {
           />
           Reactivities
         </Menu.Item>
-        <Menu.Item name="Activities" />
+        <Menu.Item as={NavLink} to="/activities" name="Activities" />
         <Menu.Item>
           <Button
-            onClick={() => activityStore.openForm()}
+            as={NavLink}
+            to="/create-activity"
             positive
             content="Create Activity"
           />

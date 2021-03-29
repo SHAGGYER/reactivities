@@ -80,12 +80,7 @@ export default observer(function ActivityForm({}: Props) {
           type="submit"
           content="Submit"
         />
-        <Button
-          onClick={activityStore.closeForm}
-          floated="right"
-          type="button"
-          content="Cancel"
-        />
+        <Button floated="right" type="button" content="Cancel" />
       </Form>
     </Segment>
   );

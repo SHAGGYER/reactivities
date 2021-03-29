@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter } from "react-router-dom";
 import "semantic-ui-css/semantic.min.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
@@ -8,7 +9,9 @@ import { StoreContext, store } from "./stores/store";
 ReactDOM.render(
   <React.StrictMode>
     <StoreContext.Provider value={store}>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </StoreContext.Provider>
   </React.StrictMode>,
   document.getElementById("root")
