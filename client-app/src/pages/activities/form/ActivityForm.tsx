@@ -1,14 +1,18 @@
 import { observer } from "mobx-react-lite";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { useParams, useHistory } from "react-router-dom";
 import { Button, Form, Segment } from "semantic-ui-react";
 import { Activity } from "../../../models/Activity";
 import { useStore } from "../../../stores/store";
+import { v4 } from "uuid";
 
 interface Props {}
 
 export default observer(function ActivityForm({}: Props) {
+  const history = useHistory();
   const { activityStore } = useStore();
-  const initialState = activityStore.selectedActivity ?? {
+  const { loadActivity, createActivity, updateActivity } = activityStore;
+  const [activity, setActivity] = useState({
     id: "",
     title: "",
     category: "",
@@ -16,14 +20,27 @@ export default observer(function ActivityForm({}: Props) {
     date: "",
     city: "",
     venue: "",
-  };
+  });
 
-  const [activity, setActivity] = useState(initialState);
+  const { id } = useParams<{ id: string }>();
+
+  useEffect(() => {
+    if (id) {
+      loadActivity(id).then((activity) => setActivity(activity!));
+    }
+  }, [id, loadActivity]);
 
   function handleSubmit() {
-    activity.id
-      ? activityStore.updateActivity(activity)
-      : activityStore.createActivity(activity);
+    if (activity.id.length === 0) {
+      let newActivity = { ...activity, id: v4() };
+      createActivity(newActivity).then(() => {
+        history.push(`/activities/${newActivity.id}`);
+      });
+    } else {
+      updateActivity(activity).then(() =>
+        history.push(`/activities/${activity.id}`)
+      );
+    }
   }
 
   function handleInputChange(

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Card, Image, Icon, Button } from "semantic-ui-react";
 import { LoadingComponent } from "../../../components/LoadingComponent";
 import { useStore } from "../../../stores/store";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 
 interface Props {}
@@ -36,7 +36,13 @@ export default observer(function ActivityDetails({}: Props) {
       </Card.Content>
       <Card.Content extra>
         <Button.Group widths="2">
-          <Button color="blue" content="Edit" basic />
+          <Button
+            color="blue"
+            content="Edit"
+            as={Link}
+            to={`/manage/${activity.id}`}
+            basic
+          />
           <Button color="grey" content="Cancel" basic />
         </Button.Group>
       </Card.Content>

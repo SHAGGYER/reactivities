@@ -37,7 +37,7 @@ export default observer(function ActivityList({}: Props) {
               <Item.Extra>
                 <Button
                   as={Link}
-                  to={`/activity/${activity.id}`}
+                  to={`/activities/${activity.id}`}
                   floated="right"
                   content="View"
                   color="blue"
