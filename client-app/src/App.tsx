@@ -12,6 +12,9 @@ import { Route, Switch, useLocation } from "react-router";
 import HomePage from "./pages/home/HomePage";
 import ActivityForm from "./pages/activities/form/ActivityForm";
 import ActivityDetails from "./pages/activities/details/ActivityDetails";
+import TestErrors from "./errors/TestError";
+import { ToastContainer } from "react-toastify";
+import ServerError from "./errors/ServerError";
 
 function App() {
   const { activityStore } = useStore();
@@ -38,6 +41,7 @@ function App() {
 
   return (
     <React.Fragment>
+      <ToastContainer position="bottom-right" hideProgressBar />
       <Route path="/" exact>
         <HomePage />
       </Route>
@@ -58,6 +62,10 @@ function App() {
               </Route>
               <Route path="/activities/:id">
                 <ActivityDetails />
+              </Route>
+              <Route path="/errors" component={TestErrors} />
+              <Route path="/server-error">
+                <ServerError />
               </Route>
             </Container>
           </React.Fragment>

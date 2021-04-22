@@ -1,10 +1,13 @@
 import { observer } from "mobx-react-lite";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { Button, Form, Segment } from "semantic-ui-react";
+import { Button, FormField, Label, Segment } from "semantic-ui-react";
 import { Activity } from "../../../models/Activity";
 import { useStore } from "../../../stores/store";
 import { v4 } from "uuid";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import MyTextInput from "../../../components/form/MyTextInput";
 
 interface Props {}
 
@@ -24,81 +27,69 @@ export default observer(function ActivityForm({}: Props) {
 
   const { id } = useParams<{ id: string }>();
 
+  const validationSchema = Yup.object({
+    title: Yup.string().required("The activity title is required"),
+    description: Yup.string().required("The activity description is required"),
+    category: Yup.string().required("The activity category is required"),
+    date: Yup.string().required(),
+    venue: Yup.string().required(),
+    city: Yup.string().required(),
+  });
+
   useEffect(() => {
     if (id) {
       loadActivity(id).then((activity) => setActivity(activity!));
     }
   }, [id, loadActivity]);
 
-  function handleSubmit() {
-    if (activity.id.length === 0) {
-      let newActivity = { ...activity, id: v4() };
-      createActivity(newActivity).then(() => {
-        history.push(`/activities/${newActivity.id}`);
-      });
-    } else {
-      updateActivity(activity).then(() =>
-        history.push(`/activities/${activity.id}`)
-      );
-    }
-  }
+  // function handleSubmit() {
+  //   if (activity.id.length === 0) {
+  //     let newActivity = { ...activity, id: v4() };
+  //     createActivity(newActivity).then(() => {
+  //       history.push(`/activities/${newActivity.id}`);
+  //     });
+  //   } else {
+  //     updateActivity(activity).then(() =>
+  //       history.push(`/activities/${activity.id}`)
+  //     );
+  //   }
+  // }
 
-  function handleInputChange(
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) {
-    const { name, value } = event.target;
-    setActivity({ ...activity, [name]: value });
-  }
+  // function handleChange(
+  //   event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  // ) {
+  //   const { name, value } = event.target;
+  //   setActivity({ ...activity, [name]: value });
+  // }
 
   return (
     <Segment clearing>
-      <Form onSubmit={handleSubmit} autoComplete="off">
-        <Form.Input
-          placeholder="Title"
-          value={activity.title}
-          name="title"
-          onChange={handleInputChange}
-        />
-        <Form.TextArea
-          placeholder="Description"
-          value={activity.description}
-          name="description"
-          onChange={handleInputChange}
-        />
-        <Form.Input
-          placeholder="Category"
-          value={activity.category}
-          name="category"
-          onChange={handleInputChange}
-        />
-        <Form.Input
-          placeholder="Date"
-          type="date"
-          value={activity.date}
-          name="date"
-          onChange={handleInputChange}
-        />
-        <Form.Input
-          placeholder="City"
-          value={activity.city}
-          name="city"
-          onChange={handleInputChange}
-        />
-        <Form.Input
-          placeholder="Venue"
-          value={activity.venue}
-          name="venue"
-          onChange={handleInputChange}
-        />
-        <Button
-          loading={activityStore.loading}
-          floated="right"
-          positive
-          type="submit"
-          content="Submit"
-        />
-        <Button floated="right" type="button" content="Cancel" />
-      </Form>
+      <Formik
+        validationSchema={validationSchema}
+        enableReinitialize
+        initialValues={activity}
+        onSubmit={(values) => console.log(values)}
+      >
+        {({ handleSubmit }) => (
+          <Form className="ui form" onSubmit={handleSubmit} autoComplete="off">
+            <MyTextInput name="title" placeholder="Title" />
+
+            <MyTextInput placeholder="Description" name="description" />
+            <MyTextInput placeholder="Category" name="category" />
+            <MyTextInput placeholder="Date" name="date" />
+            <MyTextInput placeholder="City" name="city" />
+            <MyTextInput placeholder="Venue" name="venue" />
+            <Button
+              loading={activityStore.loading}
+              floated="right"
+              positive
+              type="submit"
+              content="Submit"
+            />
+            <Button floated="right" type="button" content="Cancel" />
+          </Form>
+        )}
+      </Formik>
     </Segment>
   );
 });
