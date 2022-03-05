@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { Button, FormField, Label, Segment } from "semantic-ui-react";
+import { Button, FormField, Header, Label, Segment } from "semantic-ui-react";
 import { Activity } from "../../../models/Activity";
 import { useStore } from "../../../stores/store";
 import { v4 } from "uuid";
@@ -42,18 +42,18 @@ export default observer(function ActivityForm({}: Props) {
     }
   }, [id, loadActivity]);
 
-  // function handleSubmit() {
-  //   if (activity.id.length === 0) {
-  //     let newActivity = { ...activity, id: v4() };
-  //     createActivity(newActivity).then(() => {
-  //       history.push(`/activities/${newActivity.id}`);
-  //     });
-  //   } else {
-  //     updateActivity(activity).then(() =>
-  //       history.push(`/activities/${activity.id}`)
-  //     );
-  //   }
-  // }
+  function handleFormSubmit(activity: Activity) {
+    if (activity.id.length === 0) {
+      let newActivity = { ...activity, id: v4() };
+      createActivity(newActivity).then(() => {
+        history.push(`/activities/${newActivity.id}`);
+      });
+    } else {
+      updateActivity(activity).then(() =>
+        history.push(`/activities/${activity.id}`)
+      );
+    }
+  }
 
   // function handleChange(
   //   event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -68,18 +68,22 @@ export default observer(function ActivityForm({}: Props) {
         validationSchema={validationSchema}
         enableReinitialize
         initialValues={activity}
-        onSubmit={(values) => console.log(values)}
+        onSubmit={(values) => handleFormSubmit(values)}
       >
-        {({ handleSubmit }) => (
+        {({ handleSubmit, isValid, isSubmitting, dirty }) => (
           <Form className="ui form" onSubmit={handleSubmit} autoComplete="off">
+            <Header content="Activity Details" sub color="teal" />
             <MyTextInput name="title" placeholder="Title" />
 
             <MyTextInput placeholder="Description" name="description" />
             <MyTextInput placeholder="Category" name="category" />
             <MyTextInput placeholder="Date" name="date" />
+
+            <Header content="Location Details" sub color="teal" />
             <MyTextInput placeholder="City" name="city" />
             <MyTextInput placeholder="Venue" name="venue" />
             <Button
+              disabled={isSubmitting || dirty || !isValid}
               loading={activityStore.loading}
               floated="right"
               positive
